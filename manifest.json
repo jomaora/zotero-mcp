@@ -1,0 +1,31 @@
+{
+  "manifest_version": "0.2",
+  "name": "zotero-local-readonly",
+  "display_name": "Zotero (lecture seule)",
+  "version": "1.0.0",
+  "description": "Lit votre bibliothèque Zotero locale (références, notes, annotations) en lecture seule, via l'API locale de Zotero.",
+  "long_description": "Extension en lecture seule. Elle interroge uniquement l'API locale de Zotero sur votre ordinateur (localhost:23119). Elle n'écrit rien, n'ouvre pas le dossier Zotero ni la base zotero.sqlite, et ne contacte aucun serveur sur Internet. Prérequis : Zotero 7 ou plus ouvert, avec l'option « Allow other applications on this computer to communicate with Zotero » cochée (Réglages > Avancé).",
+  "author": {
+    "name": "Usage personnel"
+  },
+  "license": "MIT",
+  "server": {
+    "type": "node",
+    "entry_point": "server/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/server/index.js"]
+    }
+  },
+  "tools": [
+    { "name": "zotero_search", "description": "Rechercher une référence par mots du titre ou de l'auteur" },
+    { "name": "zotero_get_item", "description": "Métadonnées complètes d'une référence" },
+    { "name": "zotero_children", "description": "Lister les notes et pièces jointes d'une référence" },
+    { "name": "zotero_get_note", "description": "Lire le texte d'une note" },
+    { "name": "zotero_annotations", "description": "Lister les annotations d'un PDF" }
+  ],
+  "compatibility": {
+    "platforms": ["darwin", "win32", "linux"],
+    "runtimes": { "node": ">=18.0.0" }
+  }
+}
