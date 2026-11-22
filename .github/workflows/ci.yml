@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Tests (faux Zotero)
+        run: npm test
+      - name: Audit des dépendances d'exécution
+        run: npm audit --omit=dev
+      - name: Validation du manifeste
+        run: npm run validate
+      - name: Construction de l'extension
+        run: npm run pack
+      - uses: actions/upload-artifact@v4
+        if: matrix.node == 22
+        with:
+          name: zotero-local-readonly-mcpb
+          path: dist/zotero-local-readonly.mcpb
+          if-no-files-found: error
