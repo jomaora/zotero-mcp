@@ -9,8 +9,14 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dist = path.join(root, "dist");
 const stage = path.join(dist, "stage");
 const out = path.join(dist, "zotero-local-readonly.mcpb");
-const win = process.platform === "win32";
-const run = (cmd, args, cwd) => execFileSync(cmd, args, { cwd, stdio: "inherit", shell: win });
+// Tout passe par l'exécutable Node courant : pas de shell, pas de souci de
+// .cmd ni d'espaces dans les chemins sous Windows.
+const node = (args, cwd) => execFileSync(process.execPath, args, { cwd, stdio: "inherit" });
+const npmCli = process.env.npm_execpath; // défini par « npm run pack »
+if (!npmCli || !npmCli.endsWith(".js")) {
+  console.error("Lancer ce script avec : npm run pack");
+  process.exit(1);
+}
 
 fs.rmSync(dist, { recursive: true, force: true });
 fs.mkdirSync(stage, { recursive: true });
@@ -19,8 +25,8 @@ for (const f of ["manifest.json", "package.json", "package-lock.json", ".mcpbign
 }
 fs.cpSync(path.join(root, "server"), path.join(stage, "server"), { recursive: true });
 
-run("npm", ["ci", "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"], stage);
-const mcpb = path.join(root, "node_modules", ".bin", win ? "mcpb.cmd" : "mcpb");
-run(mcpb, ["validate", "manifest.json"], stage);
-run(mcpb, ["pack", stage, out], root);
+node([npmCli, "ci", "--omit=dev", "--ignore-scripts", "--no-audit", "--no-fund"], stage);
+const mcpb = path.join(root, "node_modules", "@anthropic-ai", "mcpb", "dist", "cli", "cli.js");
+node([mcpb, "validate", "manifest.json"], stage);
+node([mcpb, "pack", stage, out], root);
 console.log(`\nExtension prête : ${path.relative(root, out)}`);

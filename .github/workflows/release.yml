@@ -1,0 +1,35 @@
+name: Release
+
+# Publie l'extension sur la page « Releases » de GitHub quand on pousse un
+# tag de version, par exemple : git tag v1.1.0 && git push origin v1.1.0
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Le tag doit correspondre à la version du manifeste
+        run: |
+          v=$(node -p "require('./manifest.json').version")
+          test "v$v" = "$GITHUB_REF_NAME" || { echo "Tag $GITHUB_REF_NAME ≠ manifeste v$v"; exit 1; }
+      - run: npm test
+      - run: npm audit --omit=dev
+      - run: npm run pack
+      - name: Publier la release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" dist/zotero-local-readonly.mcpb \
+            --title "Zotero (lecture seule) $GITHUB_REF_NAME" \
+            --notes "Téléchargez zotero-local-readonly.mcpb ci-dessous, puis suivez la section « Installer l'extension » du README. Le même fichier sert pour macOS et Windows."

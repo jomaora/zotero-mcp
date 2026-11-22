@@ -20,7 +20,7 @@ Laissez Zotero ouvert : l'extension ne fonctionne que si Zotero tourne.
 
 ## 2. Installer l'extension
 
-1. Récupérez le fichier **`zotero-local-readonly.mcpb`**. Pour le fabriquer vous-même, voir « Pour les développeurs » en bas de page.
+1. Téléchargez le fichier **`zotero-local-readonly.mcpb`** sur la page [Releases](https://github.com/jomaora/zotero-mcp/releases/latest), dans la partie « Assets ». Le même fichier sert pour macOS et pour Windows.
 2. Double-cliquez sur le fichier : l'application Claude propose de l'installer. Sinon, ouvrez Claude, allez dans **Réglages > Extensions** et faites glisser le fichier dans la fenêtre.
 3. Confirmez l'installation. L'extension s'appelle **« Zotero (lecture seule) »**.
 
@@ -79,6 +79,7 @@ npm run pack
 
 - `npm test` lance les tests contre un faux Zotero (`tests/fake_zotero.mjs`). Ses données sont fictives.
 - `npm run pack` vérifie le manifeste et produit `dist/zotero-local-readonly.mcpb`, avec les seules dépendances d'exécution.
+- Publier une version : mettre à jour `version` dans `manifest.json`, `package.json` et `server/index.js`, commiter, puis pousser un tag `v<version>` (par exemple `git tag v1.1.0 && git push origin v1.1.0`). Le workflow `release.yml` construit le `.mcpb` et l'attache à une release GitHub.
 - Variables d'environnement facultatives : `ZOTERO_LOCAL_PORT` (port de l'API locale, 23119 par défaut) et `ZOTERO_TIMEOUT_MS` (délai par requête, 15 000 ms par défaut).
 
 Garanties du serveur (`server/index.js`) :

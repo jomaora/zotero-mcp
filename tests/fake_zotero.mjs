@@ -9,6 +9,7 @@
 //
 // Les données sont fictives (aucune donnée d'une vraie bibliothèque).
 import http from "node:http";
+import { pathToFileURL } from "node:url";
 
 const longPara = (n) => `<p>Paragraphe ${n} ` + "mot ".repeat(120) + "</p>";
 const noteHtml =
@@ -139,7 +140,7 @@ export function startFakeZotero({ mode = "ok", port = 0 } = {}) {
 }
 
 // Lancement manuel : node tests/fake_zotero.mjs <port> [ok|403|slow]
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const f = await startFakeZotero({ port: Number(process.argv[2] ?? 23119), mode: process.argv[3] ?? "ok" });
   console.log(`Faux Zotero sur 127.0.0.1:${f.port}`);
 }
